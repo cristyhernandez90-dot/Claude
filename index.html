@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mi Presupuesto">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Mi Presupuesto</title>
+<style>
+  :root{
+    --bg:#0b1220; --card:#131c2e; --card2:#1b2740; --line:#26314d;
+    --text:#e7ecf5; --muted:#94a3b8; --accent:#14b8a6; --accent2:#0ea5e9;
+    --danger:#ef4444; --warn:#f59e0b; --good:#22c55e;
+    --shadow:0 6px 22px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.4;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    position:sticky; top:0; z-index:20; background:linear-gradient(180deg,#0f766e,#0b5e57);
+    padding:calc(env(safe-area-inset-top) + 14px) 16px 14px; box-shadow:var(--shadow);
+  }
+  header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
+  header .sub{margin-top:2px;font-size:12px;color:#cbeae6}
+  .month-bar{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .month-bar select{flex:1}
+  main{padding:14px 14px 90px;max-width:760px;margin:0 auto}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .card h2{margin:0 0 12px;font-size:15px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+  .total{font-size:34px;font-weight:800;letter-spacing:-.5px}
+  .total small{font-size:14px;font-weight:600;color:var(--muted);margin-left:6px}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .kpi{background:var(--card2);border-radius:12px;padding:10px 12px}
+  .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .kpi .v{font-size:18px;font-weight:700;margin-top:2px}
+  .bars{display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:flex;flex-direction:column;gap:4px}
+  .bar-top{display:flex;justify-content:space-between;font-size:13px}
+  .bar-top .cat{display:flex;align-items:center;gap:8px}
+  .dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+  .track{height:9px;border-radius:6px;background:#0a1322;overflow:hidden}
+  .fill{height:100%;border-radius:6px}
+  .tx{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .tx:last-child{border-bottom:none}
+  .tx .ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto;background:var(--card2)}
+  .tx .mid{flex:1;min-width:0}
+  .tx .mer{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tx .meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+  .tx .amt{font-weight:700;font-size:16px;white-space:nowrap}
+  .tx .thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;flex:0 0 auto;cursor:pointer;border:1px solid var(--line)}
+  .pill{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--muted)}
+  .empty{color:var(--muted);text-align:center;padding:24px 8px;font-size:14px}
+  label.field{display:block;margin-bottom:12px;font-size:13px;color:var(--muted)}
+  input,select,textarea,button{font-family:inherit;font-size:16px}
+  input,select,textarea{width:100%;margin-top:5px;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:#0a1322;color:var(--text);outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  button{cursor:pointer;border:none;border-radius:12px;padding:12px 14px;font-weight:700;color:#04211e;background:var(--accent)}
+  button.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+  button.ghost{background:transparent;color:var(--accent);padding:6px 8px;font-weight:600}
+  button.danger{background:transparent;color:var(--danger);border:1px solid #4a2230}
+  button.block{width:100%}
+  .btn-row{display:flex;gap:10px;margin-top:6px}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:#0c1526;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar button{flex:1;background:transparent;color:var(--muted);border-radius:0;padding:10px 4px 8px;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .tabbar button .i{font-size:20px}
+  .tabbar button.active{color:var(--accent)}
+  .view{display:none}
+  .view.active{display:block}
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(2,6,15,.7);display:none;align-items:flex-end;justify-content:center}
+  .modal.open{display:flex}
+  .sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));border:1px solid var(--line)}
+  .sheet h3{margin:0 0 14px;font-size:18px}
+  .imgview{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;flex-direction:column}
+  .imgview.open{display:flex}
+  .imgview img{max-width:96vw;max-height:82vh;border-radius:10px}
+  .imgview button{margin-top:16px}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#05201d;color:#bdf3ec;border:1px solid #14b8a6;padding:10px 16px;border-radius:999px;z-index:80;opacity:0;transition:opacity .25s;font-size:14px;pointer-events:none;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+  .toast.show{opacity:1}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .preview-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  .preview-table th,.preview-table td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  .preview-table th{color:var(--muted);font-weight:600}
+  .scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .cat-manage .tx .amt{color:var(--muted);font-size:13px}
+  .badge{display:inline-block;font-size:11px;color:#04211e;background:var(--accent);border-radius:999px;padding:1px 8px;font-weight:700;margin-left:6px}
+  a{color:var(--accent2)}
+  .floating-add{position:fixed;right:16px;bottom:78px;z-index:25;width:58px;height:58px;border-radius:50%;font-size:30px;padding:0;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>💰 Mi Presupuesto</h1>
+  <div class="sub" id="subtitle">Cargando…</div>
+  <div class="month-bar">
+    <select id="monthSelect" aria-label="Mes"></select>
+    <button class="secondary" id="prevMonth" style="padding:11px 14px">‹</button>
+    <button class="secondary" id="nextMonth" style="padding:11px 14px">›</button>
+  </div>
+</header>
+
+<main>
+  <!-- RESUMEN -->
+  <section class="view active" id="view-resumen">
+    <div class="card">
+      <h2>Gasto del mes</h2>
+      <div class="total" id="monthTotal">$0.00</div>
+      <div class="kpis">
+        <div class="kpi"><div class="l">Transacciones</div><div class="v" id="kpiCount">0</div></div>
+        <div class="kpi"><div class="l">Promedio / día</div><div class="v" id="kpiAvg">$0.00</div></div>
+        <div class="kpi"><div class="l">Mayor gasto</div><div class="v" id="kpiMax">$0.00</div></div>
+        <div class="kpi"><div class="l">vs mes anterior</div><div class="v" id="kpiDelta">—</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Por categoría</h2>
+      <div class="bars" id="catBars"><div class="empty">Sin datos este mes.</div></div>
+    </div>
+    <div class="card">
+      <h2>Movimientos recientes</h2>
+      <div id="recentList"></div>
+    </div>
+  </section>
+
+  <!-- MOVIMIENTOS -->
+  <section class="view" id="view-movimientos">
+    <div class="card">
+      <h2>Todos los movimientos del mes</h2>
+      <div id="txList"></div>
+    </div>
+  </section>
+
+  <!-- IMPORTAR -->
+  <section class="view" id="view-importar">
+    <div class="card">
+      <h2>Importar desde Numbers / Atajo</h2>
+      <p class="hint">Exporta tu lista de Numbers como <b>CSV</b> y súbela aquí. La app detecta automáticamente las columnas de fecha, monto y comercio. También puedes pegar el texto directamente.</p>
+      <label class="field">Archivo CSV
+        <input type="file" id="csvFile" accept=".csv,text/csv,text/plain">
+      </label>
+      <label class="field">…o pega el contenido (CSV)
+        <textarea id="csvText" rows="4" placeholder="Fecha, Monto, Comercio&#10;15/06/2026, 24.50, Supermercado"></textarea>
+      </label>
+      <button class="block" id="parseCsv">Analizar</button>
+      <div id="importArea"></div>
+    </div>
+    <div class="card">
+      <h2>Respaldo</h2>
+      <p class="hint">Guarda o restaura todos tus datos (incluye fotos) en un archivo.</p>
+      <div class="btn-row">
+        <button class="secondary" id="exportJson">Exportar respaldo</button>
+        <button class="secondary" id="exportCsv">Exportar CSV</button>
+      </div>
+      <label class="field" style="margin-top:12px">Restaurar respaldo (.json)
+        <input type="file" id="importJson" accept=".json,application/json">
+      </label>
+    </div>
+  </section>
+
+  <!-- CATEGORÍAS -->
+  <section class="view" id="view-categorias">
+    <div class="card cat-manage">
+      <h2>Categorías y reglas automáticas</h2>
+      <p class="hint">Cuando importas o agregas un gasto, la app asigna la categoría según las palabras clave del comercio. Ej: si el comercio contiene «uber» → Transporte.</p>
+      <div id="catList"></div>
+      <button class="secondary block" id="addCat" style="margin-top:12px">+ Nueva categoría</button>
+    </div>
+    <div class="card">
+      <h2>Datos</h2>
+      <button class="danger block" id="wipe">Borrar todos los datos</button>
+    </div>
+  </section>
+</main>
+
+<button class="floating-add" id="fabAdd" title="Agregar gasto">＋</button>
+
+<nav class="tabbar">
+  <button data-view="resumen" class="active"><span class="i">📊</span>Resumen</button>
+  <button data-view="movimientos"><span class="i">🧾</span>Movimientos</button>
+  <button data-view="importar"><span class="i">📥</span>Importar</button>
+  <button data-view="categorias"><span class="i">🏷️</span>Categorías</button>
+</nav>
+
+<!-- Modal agregar/editar gasto -->
+<div class="modal" id="txModal">
+  <div class="sheet">
+    <h3 id="txModalTitle">Nuevo gasto</h3>
+    <input type="hidden" id="txId">
+    <div class="row2">
+      <label class="field">Monto
+        <input type="number" id="txAmount" inputmode="decimal" step="0.01" placeholder="0.00">
+      </label>
+      <label class="field">Fecha
+        <input type="date" id="txDate">
+      </label>
+    </div>
+    <label class="field">Comercio / descripción
+      <input type="text" id="txMerchant" placeholder="Ej: Supermercado, Uber…">
+    </label>
+    <label class="field">Categoría
+      <select id="txCategory"></select>
+    </label>
+    <label class="field">Foto del recibo
+      <input type="file" id="txPhoto" accept="image/*" capture="environment">
+    </label>
+    <div id="txPhotoPreview"></div>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="block" id="saveTx">Guardar</button>
+      <button class="secondary" id="closeTx">Cancelar</button>
+    </div>
+    <button class="danger block" id="deleteTx" style="margin-top:10px;display:none">Eliminar gasto</button>
+  </div>
+</div>
+
+<!-- Visor de imagen -->
+<div class="imgview" id="imgView">
+  <img id="imgViewImg" alt="Recibo">
+  <button class="secondary" id="closeImg">Cerrar</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

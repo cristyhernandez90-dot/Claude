@@ -1,0 +1,16 @@
+{
+  "name": "Mi Presupuesto",
+  "short_name": "Presupuesto",
+  "description": "Controla tus gastos mensuales y guarda fotos de tus recibos. 100% en tu dispositivo.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b1220",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
