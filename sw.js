@@ -1,5 +1,5 @@
 /* Service worker: permite usar la app sin conexión (modo app instalada) */
-const CACHE = 'presupuesto-v1';
+const CACHE = 'presupuesto-v2';
 const ASSETS = ['./', './index.html', './app.js', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', (e)=>{

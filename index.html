@@ -4,129 +4,170 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mi Presupuesto">
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>Mi Presupuesto</title>
 <style>
   :root{
-    --bg:#0b1220; --card:#131c2e; --card2:#1b2740; --line:#26314d;
-    --text:#e7ecf5; --muted:#94a3b8; --accent:#14b8a6; --accent2:#0ea5e9;
-    --danger:#ef4444; --warn:#f59e0b; --good:#22c55e;
-    --shadow:0 6px 22px rgba(0,0,0,.35);
+    --bg:#f6f7f9; --surface:#ffffff; --line:#ececf0; --line2:#f1f2f5;
+    --ink:#161a23; --ink2:#5b6472; --ink3:#98a0ad;
+    --accent:#0e9384; --accent-soft:#e7f5f2; --accent-ink:#0b7266;
+    --income:#0e9384; --expense:#d64550; --debt:#b6862c; --debt-soft:#f8f1de;
+    --danger:#d64550;
+    --shadow:0 1px 2px rgba(20,25,35,.04), 0 8px 24px rgba(20,25,35,.05);
+    --radius:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--text); line-height:1.4;
-    padding-bottom:env(safe-area-inset-bottom);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.45;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    padding-bottom:calc(84px + env(safe-area-inset-bottom));
   }
   header{
-    position:sticky; top:0; z-index:20; background:linear-gradient(180deg,#0f766e,#0b5e57);
-    padding:calc(env(safe-area-inset-top) + 14px) 16px 14px; box-shadow:var(--shadow);
+    position:sticky; top:0; z-index:20; background:rgba(246,247,249,.86);
+    backdrop-filter:saturate(180%) blur(14px); -webkit-backdrop-filter:saturate(180%) blur(14px);
+    border-bottom:1px solid var(--line);
+    padding:calc(env(safe-area-inset-top) + 12px) 20px 12px;
   }
-  header h1{margin:0;font-size:20px;font-weight:700;letter-spacing:.2px}
-  header .sub{margin-top:2px;font-size:12px;color:#cbeae6}
-  .month-bar{display:flex;align-items:center;gap:8px;margin-top:12px}
-  .month-bar select{flex:1}
-  main{padding:14px 14px 90px;max-width:760px;margin:0 auto}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
-  .card h2{margin:0 0 12px;font-size:15px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px}
-  .total{font-size:34px;font-weight:800;letter-spacing:-.5px}
-  .total small{font-size:14px;font-weight:600;color:var(--muted);margin-left:6px}
-  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-  .kpi{background:var(--card2);border-radius:12px;padding:10px 12px}
-  .kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-  .kpi .v{font-size:18px;font-weight:700;margin-top:2px}
-  .bars{display:flex;flex-direction:column;gap:10px}
-  .bar-row{display:flex;flex-direction:column;gap:4px}
-  .bar-top{display:flex;justify-content:space-between;font-size:13px}
-  .bar-top .cat{display:flex;align-items:center;gap:8px}
-  .dot{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
-  .track{height:9px;border-radius:6px;background:#0a1322;overflow:hidden}
-  .fill{height:100%;border-radius:6px}
-  .tx{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;justify-content:space-between}
+  .brand h1{margin:0;font-size:17px;font-weight:600;letter-spacing:-.2px}
+  .brand .mark{width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;font-size:14px;font-weight:700;margin-right:8px}
+  .brand .left{display:flex;align-items:center}
+  .stepper{display:flex;align-items:center;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px}
+  .stepper button{border:none;background:transparent;width:30px;height:28px;border-radius:9px;color:var(--ink2);font-size:16px;cursor:pointer}
+  .stepper button:active{background:var(--line2)}
+  .stepper .m{font-size:13px;font-weight:600;min-width:96px;text-align:center;color:var(--ink)}
+  .cur-bar{display:flex;gap:8px;margin-top:12px}
+  .cur-chip{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:1px;transition:.15s}
+  .cur-chip .cc-lbl{font-size:12px;color:var(--ink2);font-weight:500}
+  .cur-chip .cc-tot{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:-.2px}
+  .cur-chip.active{border-color:var(--accent);background:var(--accent-soft)}
+  .cur-chip.active .cc-lbl,.cur-chip.active .cc-tot{color:var(--accent-ink)}
+  main{padding:18px 16px;max-width:720px;margin:0 auto}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .lead{font-size:12px;color:var(--ink3);font-weight:600;text-transform:uppercase;letter-spacing:.7px;margin:0 0 14px;display:flex;justify-content:space-between;align-items:center}
+  .lead .link{font-size:12px;font-weight:600;color:var(--accent-ink);text-transform:none;letter-spacing:0;cursor:pointer}
+  .total{font-size:40px;font-weight:700;letter-spacing:-1.2px;line-height:1}
+  .total .cur{font-size:19px;font-weight:600;color:var(--ink3);margin-right:6px;letter-spacing:0}
+  .subtle{color:var(--ink2);font-size:13px;margin-top:8px}
+  .stats{display:flex;gap:8px;margin-top:18px}
+  .stat{flex:1;border:1px solid var(--line);border-radius:14px;padding:11px 12px;background:var(--surface)}
+  .stat .l{font-size:11px;color:var(--ink3);font-weight:500}
+  .stat .v{font-size:15px;font-weight:600;margin-top:3px;letter-spacing:-.3px}
+  .v.pos{color:var(--income)} .v.neg{color:var(--expense)}
+  .bars{display:flex;flex-direction:column;gap:15px}
+  .bar-row .bar-top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;margin-bottom:6px}
+  .bar-top .cat{display:flex;align-items:center;gap:9px;color:var(--ink);font-weight:500}
+  .bar-top .dot{width:9px;height:9px;border-radius:50%}
+  .bar-top .val{font-weight:600;letter-spacing:-.2px}
+  .bar-top .val .pct{color:var(--ink3);font-weight:500;font-size:12px;margin-left:6px}
+  .track{height:6px;border-radius:100px;background:var(--line2);overflow:hidden}
+  .fill{height:100%;border-radius:100px}
+  .tx{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid var(--line2)}
   .tx:last-child{border-bottom:none}
-  .tx .ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto;background:var(--card2)}
+  .tx .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto}
   .tx .mid{flex:1;min-width:0}
-  .tx .mer{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tx .meta{font-size:12px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
-  .tx .amt{font-weight:700;font-size:16px;white-space:nowrap}
-  .tx .thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;flex:0 0 auto;cursor:pointer;border:1px solid var(--line)}
-  .pill{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--card2);color:var(--muted)}
-  .empty{color:var(--muted);text-align:center;padding:24px 8px;font-size:14px}
-  label.field{display:block;margin-bottom:12px;font-size:13px;color:var(--muted)}
+  .tx .mer{font-weight:550;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
+  .tx .meta{font-size:12.5px;color:var(--ink3);margin-top:1px}
+  .tx .meta .sep{margin:0 6px;opacity:.5}
+  .tx .amt{font-weight:600;font-size:15px;white-space:nowrap;letter-spacing:-.3px}
+  .tx .amt.in{color:var(--income)} .tx .amt.ex{color:var(--ink)}
+  .tx .thumb{width:32px;height:32px;border-radius:9px;object-fit:cover;flex:0 0 auto;cursor:pointer;border:1px solid var(--line)}
+  .empty{color:var(--ink3);text-align:center;padding:30px 12px;font-size:14px}
+  .empty .big{font-size:30px;display:block;margin-bottom:8px;opacity:.7}
+  label.field{display:block;margin-bottom:14px;font-size:13px;color:var(--ink2);font-weight:500}
   input,select,textarea,button{font-family:inherit;font-size:16px}
-  input,select,textarea{width:100%;margin-top:5px;padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:#0a1322;color:var(--text);outline:none}
+  input,select,textarea{width:100%;margin-top:6px;padding:12px 13px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
   input:focus,select:focus,textarea:focus{border-color:var(--accent)}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  button{cursor:pointer;border:none;border-radius:12px;padding:12px 14px;font-weight:700;color:#04211e;background:var(--accent)}
-  button.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}
-  button.ghost{background:transparent;color:var(--accent);padding:6px 8px;font-weight:600}
-  button.danger{background:transparent;color:var(--danger);border:1px solid #4a2230}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+  button{cursor:pointer;border:none;border-radius:13px;padding:13px 16px;font-weight:600;font-size:15px;color:#fff;background:var(--accent);transition:.15s}
+  button:active{transform:translateY(1px)}
+  button.secondary{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+  button.danger{background:transparent;color:var(--danger);border:1px solid #f2d6d8}
   button.block{width:100%}
-  .btn-row{display:flex;gap:10px;margin-top:6px}
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:#0c1526;border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-  .tabbar button{flex:1;background:transparent;color:var(--muted);border-radius:0;padding:10px 4px 8px;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
-  .tabbar button .i{font-size:20px}
-  .tabbar button.active{color:var(--accent)}
-  .view{display:none}
-  .view.active{display:block}
-  .modal{position:fixed;inset:0;z-index:50;background:rgba(2,6,15,.7);display:none;align-items:flex-end;justify-content:center}
+  .btn-row{display:flex;gap:10px}
+  .hint{font-size:13px;color:var(--ink2);margin:0 0 14px;line-height:1.55}
+  .seg{display:flex;gap:6px;margin-top:6px}
+  .seg button{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--ink2);font-weight:600;padding:11px}
+  .seg button.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+  .seg.filter{margin:0 0 4px}
+  .debt{display:flex;flex-direction:column;gap:9px;padding:15px 0;border-bottom:1px solid var(--line2)}
+  .debt:last-child{border-bottom:none}
+  .debt .dt{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .debt .dn{font-weight:600;font-size:15px;letter-spacing:-.2px}
+  .debt .dk{font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;background:var(--debt-soft);color:var(--debt)}
+  .debt .dk.owe{background:#fbeaec;color:var(--expense)}
+  .debt .dk.owed{background:var(--accent-soft);color:var(--accent-ink)}
+  .debt .drem{font-weight:700;font-size:16px;letter-spacing:-.3px}
+  .debt .dmeta{font-size:12.5px;color:var(--ink3)}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar button{flex:1;background:transparent;color:var(--ink3);border-radius:0;padding:9px 2px 7px;font-size:10px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .tabbar button .i{font-size:18px;line-height:1}
+  .tabbar button.active{color:var(--accent-ink)}
+  .view{display:none}.view.active{display:block}
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(20,25,35,.34);display:none;align-items:flex-end;justify-content:center}
   .modal.open{display:flex}
-  .sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(20px + env(safe-area-inset-bottom));border:1px solid var(--line)}
-  .sheet h3{margin:0 0 14px;font-size:18px}
-  .imgview{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;flex-direction:column}
+  .sheet{background:var(--surface);width:100%;max-width:560px;max-height:93vh;overflow:auto;border-radius:22px 22px 0 0;padding:8px 20px calc(22px + env(safe-area-inset-bottom))}
+  .sheet .grab{width:38px;height:4px;border-radius:100px;background:var(--line);margin:8px auto 14px}
+  .sheet h3{margin:0 0 16px;font-size:19px;font-weight:600;letter-spacing:-.3px}
+  .imgview{position:fixed;inset:0;z-index:60;background:rgba(10,12,16,.94);display:none;align-items:center;justify-content:center;flex-direction:column}
   .imgview.open{display:flex}
-  .imgview img{max-width:96vw;max-height:82vh;border-radius:10px}
-  .imgview button{margin-top:16px}
-  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#05201d;color:#bdf3ec;border:1px solid #14b8a6;padding:10px 16px;border-radius:999px;z-index:80;opacity:0;transition:opacity .25s;font-size:14px;pointer-events:none;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+  .imgview img{max-width:94vw;max-height:80vh;border-radius:12px}
+  .imgview button{margin-top:18px}
+  .toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:100px;z-index:80;opacity:0;transition:opacity .25s;font-size:14px;pointer-events:none;box-shadow:var(--shadow);max-width:88vw;text-align:center}
   .toast.show{opacity:1}
-  .hint{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
-  .preview-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
-  .preview-table th,.preview-table td{padding:6px 6px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
-  .preview-table th{color:var(--muted);font-weight:600}
-  .scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .cat-manage .tx .amt{color:var(--muted);font-size:13px}
-  .badge{display:inline-block;font-size:11px;color:#04211e;background:var(--accent);border-radius:999px;padding:1px 8px;font-weight:700;margin-left:6px}
-  a{color:var(--accent2)}
-  .floating-add{position:fixed;right:16px;bottom:78px;z-index:25;width:58px;height:58px;border-radius:50%;font-size:30px;padding:0;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center}
+  .preview-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+  .preview-table th,.preview-table td{padding:7px 8px;border-bottom:1px solid var(--line2);text-align:left;white-space:nowrap}
+  .preview-table th{color:var(--ink3);font-weight:600}
+  .preview-table .bad{color:var(--danger)}
+  .scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px}
+  .fab{position:fixed;right:18px;bottom:calc(78px + env(safe-area-inset-bottom));z-index:25;width:56px;height:56px;border-radius:50%;font-size:26px;padding:0;box-shadow:0 6px 20px rgba(14,147,132,.4);display:flex;align-items:center;justify-content:center}
+  .cat-kw{font-size:12.5px;color:var(--ink3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  a{color:var(--accent-ink)}
 </style>
 </head>
 <body>
 <header>
-  <h1>💰 Mi Presupuesto</h1>
-  <div class="sub" id="subtitle">Cargando…</div>
-  <div class="month-bar">
-    <select id="monthSelect" aria-label="Mes"></select>
-    <button class="secondary" id="prevMonth" style="padding:11px 14px">‹</button>
-    <button class="secondary" id="nextMonth" style="padding:11px 14px">›</button>
+  <div class="brand">
+    <span class="left"><span class="mark">$</span><h1>Mi Presupuesto</h1></span>
+    <div class="stepper">
+      <button id="prevMonth" aria-label="Mes anterior">‹</button>
+      <span class="m" id="monthLabel">—</span>
+      <button id="nextMonth" aria-label="Mes siguiente">›</button>
+    </div>
   </div>
+  <div class="cur-bar" id="currencyBar"></div>
 </header>
 
 <main>
   <!-- RESUMEN -->
   <section class="view active" id="view-resumen">
     <div class="card">
-      <h2>Gasto del mes</h2>
-      <div class="total" id="monthTotal">$0.00</div>
-      <div class="kpis">
-        <div class="kpi"><div class="l">Transacciones</div><div class="v" id="kpiCount">0</div></div>
-        <div class="kpi"><div class="l">Promedio / día</div><div class="v" id="kpiAvg">$0.00</div></div>
-        <div class="kpi"><div class="l">Mayor gasto</div><div class="v" id="kpiMax">$0.00</div></div>
-        <div class="kpi"><div class="l">vs mes anterior</div><div class="v" id="kpiDelta">—</div></div>
+      <p class="lead">Gasto del mes</p>
+      <div class="total" id="monthTotal">—</div>
+      <div class="subtle" id="monthSub">Sin movimientos todavía.</div>
+      <div class="stats">
+        <div class="stat"><div class="l">Ingresos</div><div class="v pos" id="kpiIncome">—</div></div>
+        <div class="stat"><div class="l">Balance</div><div class="v" id="kpiBalance">—</div></div>
+        <div class="stat"><div class="l">vs mes ant.</div><div class="v" id="kpiDelta">—</div></div>
       </div>
     </div>
-    <div class="card">
-      <h2>Por categoría</h2>
-      <div class="bars" id="catBars"><div class="empty">Sin datos este mes.</div></div>
+    <div class="card" id="debtSummaryCard" style="display:none">
+      <p class="lead">Deudas <span class="link" id="goDebts">Ver todas ›</span></p>
+      <div id="debtSummary"></div>
     </div>
     <div class="card">
-      <h2>Movimientos recientes</h2>
+      <p class="lead">Gastos por categoría</p>
+      <div class="bars" id="catBars"></div>
+    </div>
+    <div class="card">
+      <p class="lead">Recientes</p>
       <div id="recentList"></div>
     </div>
   </section>
@@ -134,101 +175,137 @@
   <!-- MOVIMIENTOS -->
   <section class="view" id="view-movimientos">
     <div class="card">
-      <h2>Todos los movimientos del mes</h2>
+      <p class="lead">Movimientos del mes</p>
+      <div class="seg filter" id="movFilter">
+        <button data-f="todos" class="on">Todos</button>
+        <button data-f="gasto">Gastos</button>
+        <button data-f="ingreso">Ingresos</button>
+      </div>
       <div id="txList"></div>
+    </div>
+  </section>
+
+  <!-- DEUDAS -->
+  <section class="view" id="view-deudas">
+    <div class="card">
+      <p class="lead">Deudas y préstamos</p>
+      <p class="hint">Lleva el control de lo que <b>debes</b> y lo que <b>te deben</b>. Registra abonos y ve cuánto falta.</p>
+      <div id="debtList"></div>
+      <button class="secondary block" id="addDebt" style="margin-top:14px">+ Nueva deuda / préstamo</button>
     </div>
   </section>
 
   <!-- IMPORTAR -->
   <section class="view" id="view-importar">
     <div class="card">
-      <h2>Importar desde Numbers / Atajo</h2>
-      <p class="hint">Exporta tu lista de Numbers como <b>CSV</b> y súbela aquí. La app detecta automáticamente las columnas de fecha, monto y comercio. También puedes pegar el texto directamente.</p>
-      <label class="field">Archivo CSV
-        <input type="file" id="csvFile" accept=".csv,text/csv,text/plain">
-      </label>
-      <label class="field">…o pega el contenido (CSV)
-        <textarea id="csvText" rows="4" placeholder="Fecha, Monto, Comercio&#10;15/06/2026, 24.50, Supermercado"></textarea>
-      </label>
-      <button class="block" id="parseCsv">Analizar</button>
+      <p class="lead">Importar desde Numbers</p>
+      <p class="hint">Exporta tu hoja de Numbers como <b>CSV</b> y súbela aquí. La app detecta las columnas y te muestra una vista previa para que confirmes antes de importar.</p>
+      <label class="field">Archivo CSV<input type="file" id="csvFile" accept=".csv,text/csv,text/plain"></label>
+      <details style="margin-bottom:14px">
+        <summary style="color:var(--ink2);font-size:13px;cursor:pointer">…o pegar el texto</summary>
+        <textarea id="csvText" rows="4" placeholder="Fecha, Monto, Comercio" style="margin-top:8px"></textarea>
+      </details>
+      <button class="block" id="parseCsv">Analizar CSV</button>
       <div id="importArea"></div>
-    </div>
-    <div class="card">
-      <h2>Respaldo</h2>
-      <p class="hint">Guarda o restaura todos tus datos (incluye fotos) en un archivo.</p>
-      <div class="btn-row">
-        <button class="secondary" id="exportJson">Exportar respaldo</button>
-        <button class="secondary" id="exportCsv">Exportar CSV</button>
-      </div>
-      <label class="field" style="margin-top:12px">Restaurar respaldo (.json)
-        <input type="file" id="importJson" accept=".json,application/json">
-      </label>
     </div>
   </section>
 
-  <!-- CATEGORÍAS -->
-  <section class="view" id="view-categorias">
-    <div class="card cat-manage">
-      <h2>Categorías y reglas automáticas</h2>
-      <p class="hint">Cuando importas o agregas un gasto, la app asigna la categoría según las palabras clave del comercio. Ej: si el comercio contiene «uber» → Transporte.</p>
+  <!-- AJUSTES -->
+  <section class="view" id="view-ajustes">
+    <div class="card">
+      <p class="lead">Categorías y reglas</p>
+      <p class="hint">Cada gasto se clasifica solo según palabras clave del comercio (ej. «uber» → Transporte). Toca para editarlas.</p>
       <div id="catList"></div>
-      <button class="secondary block" id="addCat" style="margin-top:12px">+ Nueva categoría</button>
+      <button class="secondary block" id="addCat" style="margin-top:14px">+ Nueva categoría</button>
     </div>
     <div class="card">
-      <h2>Datos</h2>
+      <p class="lead">Respaldo</p>
+      <p class="hint">Guarda o restaura todos tus datos y fotos en un archivo.</p>
+      <div class="btn-row">
+        <button class="secondary block" id="exportJson">Exportar respaldo</button>
+        <button class="secondary block" id="exportCsv">Exportar CSV</button>
+      </div>
+      <label class="field" style="margin-top:14px">Restaurar respaldo (.json)<input type="file" id="importJson" accept=".json,application/json"></label>
+    </div>
+    <div class="card">
+      <p class="lead">Datos</p>
       <button class="danger block" id="wipe">Borrar todos los datos</button>
     </div>
   </section>
 </main>
 
-<button class="floating-add" id="fabAdd" title="Agregar gasto">＋</button>
+<button class="fab" id="fabAdd" aria-label="Agregar">＋</button>
 
 <nav class="tabbar">
-  <button data-view="resumen" class="active"><span class="i">📊</span>Resumen</button>
-  <button data-view="movimientos"><span class="i">🧾</span>Movimientos</button>
-  <button data-view="importar"><span class="i">📥</span>Importar</button>
-  <button data-view="categorias"><span class="i">🏷️</span>Categorías</button>
+  <button data-view="resumen" class="active"><span class="i">◎</span>Resumen</button>
+  <button data-view="movimientos"><span class="i">≡</span>Movim.</button>
+  <button data-view="deudas"><span class="i">⊟</span>Deudas</button>
+  <button data-view="importar"><span class="i">↧</span>Importar</button>
+  <button data-view="ajustes"><span class="i">⚙</span>Ajustes</button>
 </nav>
 
-<!-- Modal agregar/editar gasto -->
+<!-- Modal movimiento (gasto/ingreso) -->
 <div class="modal" id="txModal">
   <div class="sheet">
+    <div class="grab"></div>
     <h3 id="txModalTitle">Nuevo gasto</h3>
     <input type="hidden" id="txId">
+    <label class="field">Tipo<div class="seg" id="txTypeSeg">
+      <button type="button" data-type="gasto" class="on">Gasto</button>
+      <button type="button" data-type="ingreso">Ingreso</button>
+    </div></label>
     <div class="row2">
-      <label class="field">Monto
-        <input type="number" id="txAmount" inputmode="decimal" step="0.01" placeholder="0.00">
-      </label>
-      <label class="field">Fecha
-        <input type="date" id="txDate">
-      </label>
+      <label class="field">Monto<input type="number" id="txAmount" inputmode="decimal" step="0.01" placeholder="0.00"></label>
+      <label class="field">Fecha<input type="date" id="txDate"></label>
     </div>
-    <label class="field">Comercio / descripción
-      <input type="text" id="txMerchant" placeholder="Ej: Supermercado, Uber…">
-    </label>
-    <label class="field">Categoría
-      <select id="txCategory"></select>
-    </label>
-    <label class="field">Foto del recibo
-      <input type="file" id="txPhoto" accept="image/*" capture="environment">
-    </label>
+    <label class="field">Moneda<div class="seg" id="txCurrencySeg"></div></label>
+    <label class="field" id="txMerchantField">Comercio / descripción<input type="text" id="txMerchant" placeholder="Ej: Supermercado, Uber…"></label>
+    <label class="field">Categoría<select id="txCategory"></select></label>
+    <label class="field">Foto del recibo<input type="file" id="txPhoto" accept="image/*" capture="environment"></label>
     <div id="txPhotoPreview"></div>
     <div class="btn-row" style="margin-top:8px">
       <button class="block" id="saveTx">Guardar</button>
-      <button class="secondary" id="closeTx">Cancelar</button>
+      <button class="secondary" id="closeTx" style="flex:0 0 auto">Cancelar</button>
     </div>
-    <button class="danger block" id="deleteTx" style="margin-top:10px;display:none">Eliminar gasto</button>
+    <button class="danger block" id="deleteTx" style="margin-top:10px;display:none">Eliminar</button>
   </div>
 </div>
 
-<!-- Visor de imagen -->
+<!-- Modal deuda -->
+<div class="modal" id="debtModal">
+  <div class="sheet">
+    <div class="grab"></div>
+    <h3 id="debtModalTitle">Nueva deuda</h3>
+    <input type="hidden" id="debtId">
+    <label class="field">Tipo<div class="seg" id="debtKindSeg">
+      <button type="button" data-kind="debo" class="on">Yo debo</button>
+      <button type="button" data-kind="me_deben">Me deben</button>
+    </div></label>
+    <label class="field">Nombre / concepto<input type="text" id="debtName" placeholder="Ej: Préstamo carro, Le presté a Ana…"></label>
+    <div class="row2">
+      <label class="field">Monto total<input type="number" id="debtAmount" inputmode="decimal" step="0.01" placeholder="0.00"></label>
+      <label class="field">Ya pagado<input type="number" id="debtPaid" inputmode="decimal" step="0.01" placeholder="0.00"></label>
+    </div>
+    <label class="field">Moneda<div class="seg" id="debtCurrencySeg"></div></label>
+    <div class="row2">
+      <label class="field">Fecha límite (opcional)<input type="date" id="debtDue"></label>
+      <label class="field">Abonar ahora<input type="number" id="debtPayNow" inputmode="decimal" step="0.01" placeholder="0.00"></label>
+    </div>
+    <label class="field">Nota (opcional)<input type="text" id="debtNote" placeholder="Detalle…"></label>
+    <div class="btn-row" style="margin-top:8px">
+      <button class="block" id="saveDebt">Guardar</button>
+      <button class="secondary" id="closeDebt" style="flex:0 0 auto">Cancelar</button>
+    </div>
+    <button class="danger block" id="deleteDebt" style="margin-top:10px;display:none">Eliminar deuda</button>
+  </div>
+</div>
+
 <div class="imgview" id="imgView">
   <img id="imgViewImg" alt="Recibo">
   <button class="secondary" id="closeImg">Cerrar</button>
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script src="app.js"></script>
 </body>
 </html>
