@@ -1,5 +1,5 @@
 /* Service worker: offline + actualización automática (network-first para el código). */
-const CACHE = 'presupuesto-v3';
+const CACHE = 'presupuesto-v4';
 const ASSETS = ['./', './index.html', './app.js', './manifest.webmanifest', './icon.svg'];
 
 self.addEventListener('install', e=>{

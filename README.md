@@ -1,4 +1,4 @@
-# 💰 Mi Presupuesto
+# 💰 Money Tracker
 
 App personal para controlar tus gastos mensuales y guardar fotos de tus recibos.
 **Funciona 100% en tu dispositivo** — sin servidores, sin cuentas, sin internet (después de la primera carga) y gratis. Tus datos y fotos nunca salen de tu teléfono.
