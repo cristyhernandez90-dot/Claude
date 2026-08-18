@@ -414,17 +414,28 @@ function normalizeDate(s){
 }
 
 let importRows=[], importHeader=[], importRawText='';
+function colStats(sample,i){
+  let numeric=0,dates=0,nonEmpty=0; const vals=new Set();
+  for(const r of sample){ const c=(r[i]==null?'':String(r[i])).trim(); if(!c) continue; nonEmpty++; vals.add(c.toLowerCase());
+    if(!isNaN(parseAmount(c))&&/\d/.test(c)) numeric++; if(looksLikeDate(c)) dates++; }
+  return {numeric,dates,nonEmpty,variety:nonEmpty?vals.size/nonEmpty:0};
+}
+// Detecta columnas por su CONTENIDO (no solo por el título), tolerante a hojas con encabezados corridos.
 function guessColumns(header,sample){
-  const H=header.map(h=>String(h).toLowerCase());
-  const find=(...k)=>H.findIndex(h=>k.some(x=>h.includes(x)));
-  let dateCol=find('fecha','date','día','dia','time','hora');
-  let amtCol=find('monto','importe','amount','total','precio','cantidad','valor','cobro','gasto','lempira','dolar','$');
-  let merCol=find('comercio','merchant','tienda','descrip','concepto','lugar','nombre','detalle','store');
-  let catCol=find('categor','category','tipo','rubro');
-  const cols=(sample[0]||[]).length;
-  if(dateCol<0) for(let i=0;i<cols;i++) if(sample.some(r=>looksLikeDate(r[i]))){ dateCol=i; break; }
-  if(amtCol<0) for(let i=0;i<cols;i++) if(i!==dateCol && sample.some(r=>!isNaN(parseAmount(r[i]))&&/\d/.test(String(r[i])))){ amtCol=i; break; }
-  if(merCol<0) for(let i=0;i<cols;i++) if(i!==dateCol&&i!==amtCol){ merCol=i; break; }
+  const H=header.map(h=>String(h||'').toLowerCase());
+  const cols=Math.max(...sample.map(r=>r.length),(H.length||0));
+  const st=[]; for(let i=0;i<cols;i++) st.push(colStats(sample,i));
+  const hm=(i,...k)=>H[i] && k.some(x=>H[i].includes(x));
+  // Fecha: mayor proporción de fechas
+  let dateCol=-1,best=-1;
+  for(let i=0;i<cols;i++){ const s=st[i]; if(!s.nonEmpty||!s.dates) continue; let sc=s.dates/s.nonEmpty; if(hm(i,'fecha','date','día','dia')) sc+=0.3; if(sc>best){ best=sc; dateCol=i; } }
+  // Monto: columna mayormente numérica (no la fecha); prioriza títulos de dinero y no ser la más variada de texto
+  let amtCol=-1; best=-1;
+  for(let i=0;i<cols;i++){ if(i===dateCol) continue; const s=st[i]; if(!s.nonEmpty) continue; const ratio=s.numeric/s.nonEmpty; if(ratio<0.5) continue; let sc=ratio; if(hm(i,'total','monto','importe','amount','valor','precio','cobro','lempira','dolar')) sc+=0.3; if(sc>best){ best=sc; amtCol=i; } }
+  // Comercio: columna de texto (no numérica), distinta de fecha/monto, con más variedad de valores
+  let merCol=-1; best=-1;
+  for(let i=0;i<cols;i++){ if(i===dateCol||i===amtCol) continue; const s=st[i]; if(!s.nonEmpty) continue; if(s.numeric/s.nonEmpty>0.6) continue; let sc=s.variety; if(hm(i,'comercio','tienda','descrip','concepto','lugar','detalle','nombre','merchant','store')) sc+=0.2; if(sc>best){ best=sc; merCol=i; } }
+  let catCol=H.findIndex(h=>h&&(h.includes('categor')||h.includes('rubro')));
   return {dateCol,amtCol,merCol,catCol};
 }
 function analyzeCsv(){
@@ -479,7 +490,7 @@ function updatePreview(){
 async function doImport(){
   const m=currentMapping();
   if(m.aC<0){ toast('Selecciona la columna de Monto'); return; }
-  let imported=0,skipped=0;
+  let imported=0,skipped=0,lastMonth='';
   for(const r of importRows){
     const amount=parseAmount(r[m.aC]); if(!(amount>0)){ skipped++; continue; }
     const merchant=m.mC>=0?String(r[m.mC]||'').trim():'';
@@ -488,8 +499,11 @@ async function doImport(){
     if(m.type==='ingreso'&&!category) category='Otros ingresos';
     const date=m.dC>=0?(normalizeDate(r[m.dC])||todayISO()):todayISO();
     await saveTransaction({type:m.type,amount,currency:m.cur,merchant,category,date,photo:null});
+    const mo=date.slice(0,7); if(mo>lastMonth) lastMonth=mo;
     imported++;
   }
+  if(lastMonth) currentMonth=lastMonth;   // saltar al mes de los datos importados
+  currentCurrency=m.cur;
   $('importArea').innerHTML=''; $('csvText').value=''; $('csvFile').value=''; importRawText=''; importRows=[]; importHeader=[];
   await renderAll(); switchView('resumen');
   toast(`Importados ${imported}${skipped?`, ${skipped} omitidos`:''}`);
