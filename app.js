@@ -581,6 +581,14 @@ function wire(){
 async function init(){
   await openDB(); await ensureCategories(); wire(); await renderAll();
   switchView('resumen');
-  if('serviceWorker' in navigator){ try{ await navigator.serviceWorker.register('sw.js'); }catch(e){} }
+  if('serviceWorker' in navigator){
+    try{
+      const reg=await navigator.serviceWorker.register('sw.js');
+      reg.addEventListener('updatefound',()=>{ const nw=reg.installing; if(!nw) return;
+        nw.addEventListener('statechange',()=>{ if(nw.state==='activated' && navigator.serviceWorker.controller) location.reload(); });
+      });
+      if(reg.update) reg.update();
+    }catch(e){}
+  }
 }
 init();
